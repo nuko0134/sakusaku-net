@@ -13,11 +13,8 @@ img{
 h3{
     font-size: 1.1rem;
     padding-left: 10px;
-    border-left: 4px solid #111;
+
     margin-top: 40px;
-}
-h2{
-    border-bottom: 4px double #999;
 }
 header{
     border: none;
@@ -25,4 +22,21 @@ header{
 }
 .reader_url_box{
     text-align: center;
+}
+
+@media (prefers-color-scheme: dark) {
+    h2{
+        border-bottom: 4px double #fff;
+    }
+    h3{
+        border-left: 4px solid #fff;
+    }
+}
+@media (prefers-color-scheme: light) {
+    h2{
+        border-bottom: 4px double #999;
+    }
+    h3{
+        border-left: 4px solid #111;
+    }
 }

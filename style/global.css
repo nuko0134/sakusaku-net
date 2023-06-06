@@ -43,16 +43,19 @@ footer{
     body{
         color: #111;
     }
+    footer{
+        color: #424242;
+    }
 }
 
 .search_box_input{
-    width: 90%;
+    width: 85%;
     height:40px;
     border-radius:20px;
     outline:0;
     margin-bottom:40px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 header{
