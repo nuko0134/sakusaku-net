@@ -50,6 +50,7 @@ if(isset($_REQUEST['url'])){
     }
 }
 else{
+    header("HTTP/1.1 404 Not Found");
     $title = "URLを指定してください";
     $content_url_prefix = "URLが指定されていません。URLを指定して再度試してください。";
     $url = "read.php";

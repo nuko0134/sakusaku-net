@@ -17,17 +17,54 @@ function Add_Prefix_2_Link($content, $prefix){
     return $new_content;
 }
 
+
+// HTMLからimgタグを探し出してsrc属性に$prefixを追加する関数
+function Add_Prefix_2_Img_Src($html, $prefix) { // $prefixを引数として受け取る
+    // 正規表現でimgタグを見つける
+    $imgRegex = '~<img.*?>~';
+    // imgタグごとに処理する
+    $newHtml = preg_replace_callback($imgRegex, function($imgTag) use ($prefix) { // $prefixをクロージャに渡す
+      // 正規表現でsrc属性の内容を取り出す
+      $srcRegex = '/src="(.*?)"/';
+      preg_match($srcRegex, $imgTag[0], $srcMatch);
+      // src属性がなければそのまま返す
+      if (!$srcMatch) return $imgTag[0];
+      // src属性の内容を取り出す
+      $src = $srcMatch[1];
+      // src属性の内容がdata:imageで始まる場合はdata-src属性の内容に置き換える
+      if (strpos($src, "data:image") === 0) {
+        // 正規表現でdata-src属性の内容を取り出す
+        $dataSrcRegex = '/data-src="(.*?)"/';
+        preg_match($dataSrcRegex, $imgTag[0], $dataSrcMatch);
+        // data-src属性があればその内容に置き換える
+        if ($dataSrcMatch) {
+          $src = $dataSrcMatch[1];
+        }
+      }
+      // src属性の内容に$prefixを追加する
+      $newSrc = $prefix . $src;
+      // imgタグのsrc属性を新しい内容に置き換える
+      $newImgTag = preg_replace($srcRegex, "src=\"$newSrc\"", $imgTag[0]);
+      // 新しいimgタグを返す
+      return $newImgTag;
+    }, $html);
+    // 新しいHTMLを返す
+    return Add_Prefix_2_Img_Src_Tmp($newHtml, $prefix);
+  }
+  
+  
 //画像を変換する
-function Add_Prefix_2_Img_Src($content, $prefix){
-  // 正規表現パターン（[^>]*を追加し、src属性以外のものを無視）
-  $pattern = '/<img[^>]* src="(?!https?:\/\/redirect\.com)([^"]+)"[^>]*>/';
-  // 置換後の文字列（src属性だけにする）
-  $replacement = '<img src="'.$prefix.'$1">';
-  // preg_replace関数で置換
-  $new_content = preg_replace($pattern, $replacement, $content);
-  // 結果を表示
-  return $new_content;
+function Add_Prefix_2_Img_Src_Tmp($content, $prefix){
+    // 正規表現パターン（[^>]*を追加し、src属性以外のものを無視）
+    $pattern = '/<img[^>]* src="(?!https?:\/\/redirect\.com)([^"]+)"[^>]*>/';
+    // 置換後の文字列（src属性だけにする）
+    $replacement = '<img src="'.$prefix.'$1">';
+    // preg_replace関数で置換
+    $new_content = preg_replace($pattern, $replacement, $content);
+    // 結果を表示
+    return $new_content;
 }
+
 
 // URLが画像ファイルかどうかを正規表現で確認する関数
 function is_image_url($url) {
@@ -39,14 +76,37 @@ function is_image_url($url) {
 
 function save_with_webp($img_path, $url){
     if (str_starts_with($img_path, "./")){
-        if(!str_ends_with($url, "/")){
+        if(str_ends_with($url, ".html")){
+            $int = 0;
+            while($int < 6){
+                $url = mb_substr($url, 0, -1);
+                $int++;
+            }
             $url = $url . "/";
             $img_path = str_replace("./", $url, $img_path);
         }
+        else if(str_ends_with($url, ".htm")){
+            $int = 0;
+            while($int < 5){
+                $url = mb_substr($url, 0, -1);
+                $int++;
+            }
+            $url = $url . "/";
+            $img_path = str_replace("./", $url, $img_path);
+        }
+        else if(str_ends_with($url, "/")){
+            $img_path = str_replace("./", $url, $img_path);
+        }
         else{
+            $url = $url . "/";
             $img_path = str_replace("./", $url, $img_path);
         }
     }
+    if (str_starts_with($img_path, "/")){
+        $url_parts = parse_url($url, PHP_URL_HOST);
+        $img_path = "http://{$url_parts}{$img_path}";
+    }
+
     $data = file_get_contents($img_path);
     $tmp_filename = mt_rand(1, 100000000);
 
@@ -66,6 +126,7 @@ function save_with_webp($img_path, $url){
         $image_file = imagecreatefrompng("tmp/" . $tmp_filename);
     }
     else{
+        unlink("../tmp/" . $tmp_filename);
         return ($img_path);
     }
 
@@ -109,6 +170,7 @@ function save_with_webp($img_path, $url){
 }
 
 function Readability_Raw($url){
+    header("HTTP/1.1 404 Not Found");
     $title = "軽量化できませんでした";
     $content_raw = "<p>記事の取得時にエラーが発生しました。URLが正しいかを確認してください。</p>";
 
@@ -116,8 +178,10 @@ function Readability_Raw($url){
     try{
         $html = file_get_contents($url);
         $html = mb_convert_encoding($html, "UTF-8", "ASCII,JIS,UTF-8,EUC-JP,SJIS" );
+
     }
     catch(Exception $e){
+        header("HTTP/1.1 404 Not Found");
         $title = "軽量化できませんでした";
         $content_raw = "<p>記事の取得時にエラーが発生しました。ドメイン名が間違っている可能性があります。URLが正しいかを確認してください。</p>";
     }
@@ -237,17 +301,20 @@ function Readability_Raw_Extra($url){
             return array($title, $content_raw);
         }
         else{
+            header("HTTP/1.1 404 Not Found");
             $title = $titles;
             $content_raw = "ウィキペディアに{$titles}という項目が存在しませんでした。";
             return array($title, $content_raw);
         }
     }
     else if($url_parts == $domain_list[1]){
+        header("HTTP/1.1 404 Not Found");
         $title = "Youtubeには対応していません。";
         $content_raw = "「元ページを表示」をクリックしてYoutubeアプリでご視聴ください。";
         return array($title, $content_raw);
     }
     else if($url_parts == $domain_list[2]){
+        header("HTTP/1.1 404 Not Found");
         $title = "Google.comには対応していません。";
         $content_raw = "本サイトはGoogle検索を使用していますので検索結果は同じです。軽量化を望まれていて、Google検索を使用したい場合はこのサービスに付属している検索エンジンをご利用ください。";
         return array($title, $content_raw);
