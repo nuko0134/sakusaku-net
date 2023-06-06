@@ -3,6 +3,7 @@
 //基本ライブラリの読み込み
 require_once('components/xss.php');
 require_once('components/components.php');
+require_once('components/cookie.php');
 
 // 初期値設定
 $search_query = $_REQUEST['keyword'];

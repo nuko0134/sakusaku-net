@@ -132,7 +132,6 @@ function save_with_webp($img_path, $url){
 
     // コピー元画像のサイズ取得
     $imagesize = getimagesize("tmp/" . $tmp_filename);
-    unlink("tmp/" . $tmp_filename);
     $src_w = $imagesize[0];
     $src_h = $imagesize[1];
 
@@ -171,7 +170,6 @@ function save_with_webp($img_path, $url){
 }
 
 function Readability_Raw($url){
-    header("HTTP/1.1 404 Not Found");
     $title = "軽量化できませんでした";
     $content_raw = "<p>記事の取得時にエラーが発生しました。URLが正しいかを確認してください。</p>";
 
@@ -418,4 +416,12 @@ function isScrapable($url) {
   return true; // スクレイピング可能
 }
 
+function replace_img_tags($html, $replacement) {
+    // IMGタグの正規表現パターン
+    $pattern = '/<img[^>]*>/i';
+    // $replacementで置換する
+    $result = preg_replace($pattern, $replacement, $html);
+    // 結果を返す
+    return $result;
+}
 ?>

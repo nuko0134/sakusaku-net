@@ -3,6 +3,8 @@
 //基本ライブラリの読み込み
 require_once('components/xss.php');
 require_once('components/components.php');
+require_once('components/cookie.php');
+
 
 if(isset($_REQUEST['url'])){
     $url = $_REQUEST['url'];
@@ -32,8 +34,14 @@ if(isset($_REQUEST['url'])){
                 //HTMLのリンクを変換
                 $content_url_prefix = Add_Prefix_2_Link($content_raw, "http://localhost/sakusaku-net/read.php?url=");
     
-                //HTMLのリンクを変換
-                $content_url_prefix = Add_Prefix_2_Img_Src($content_url_prefix, "http://localhost/sakusaku-net/read.php?root_url={$url}&url=");
+                if($_COOKIE['SAKUSAKUimgshow'] == true){
+                    //画像のリンクを変換
+                    $content_final = Add_Prefix_2_Img_Src($content_url_prefix, "http://localhost/sakusaku-net/read.php?root_url={$url}&url=");
+                }
+                else{
+                    $content_final = replace_img_tags($content_url_prefix, "<p style=\"text-align: center;margin: 20px;\">画像は表示されません</p>");
+                }
+                
             }
             else{
                 //Rawの本文を取得
@@ -45,8 +53,13 @@ if(isset($_REQUEST['url'])){
                 //HTMLのリンクを変換
                 $content_url_prefix = Add_Prefix_2_Link($content_raw, "http://localhost/sakusaku-net/read.php?url=");
     
-                //HTMLのリンクを変換
-                $content_url_prefix = Add_Prefix_2_Img_Src($content_url_prefix, "http://localhost/sakusaku-net/read.php?root_url={$url}&url=");
+                if($_COOKIE['SAKUSAKUimgshow'] == true){
+                    //画像のリンクを変換
+                    $content_final = Add_Prefix_2_Img_Src($content_url_prefix, "http://localhost/sakusaku-net/read.php?root_url={$url}&url=");
+                }
+                else{
+                    $content_final = replace_img_tags($content_url_prefix, "<p style=\"text-align: center;margin: 20px;\">画像は表示されません</p>");
+                }
             }
         }
         else{
@@ -86,7 +99,7 @@ else{
         <a href="<?php echo $url?>">元ページを表示</a>
     </header>
     <hr>
-    <div class="article_body"><h1><?php echo $title ?></h1><?php echo $content_url_prefix ?></div>
+    <div class="article_body"><h1><?php echo $title ?></h1><?php echo $content_final ?></div>
     
     <footer>
     <hr>
