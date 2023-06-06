@@ -42,7 +42,7 @@ function Add_Prefix_2_Img_Src($html, $prefix) { // $prefixを引数として受�
         }
       }
       // src属性の内容に$prefixを追加する
-      $newSrc = $prefix . $src;
+      $newSrc = $src;
       // imgタグのsrc属性を新しい内容に置き換える
       $newImgTag = preg_replace($srcRegex, "src=\"$newSrc\"", $imgTag[0]);
       // 新しいimgタグを返す
@@ -132,6 +132,7 @@ function save_with_webp($img_path, $url){
 
     // コピー元画像のサイズ取得
     $imagesize = getimagesize("tmp/" . $tmp_filename);
+    unlink("tmp/" . $tmp_filename);
     $src_w = $imagesize[0];
     $src_h = $imagesize[1];
 
@@ -359,5 +360,62 @@ function extract_substrings($begin, $end, $text)
     }
 }
 
+function getRobots($url) {
+  $robotsUrl = "http://" . parse_url($url, PHP_URL_HOST) . "/robots.txt"; // robots.txtのURLを作成
+  $robot = null; // 現在のUser-agentを表す変数
+  $allRobots = []; // 全てのUser-agentとDisallowパスを格納する配列
+
+  $fh = fopen($robotsUrl,'r'); // robots.txtを読み込む
+  while (($line = fgets($fh)) != false) { // 1行ずつ処理する
+    if (preg_match('/User-agent:\s*(.*)/i', $line, $match)) { // User-agent行なら
+      $robot = $match[1]; // User-agent名を取得
+      if (!isset($allRobots[$robot])) { // 配列にまだ存在しなければ
+        $allRobots[$robot] = []; // 空の配列を作成
+      }
+    } elseif (preg_match('/Disallow:\s*(.*)/i', $line, $match)) { // Disallow行なら
+      if ($robot !== null) { // Us  er-agent名が設定されていれば
+        $allRobots[$robot][] = $match[1]; // Disallowパスを配列に追加
+      }
+    }
+  }
+  fclose($fh); // ファイルを閉じる
+  return $allRobots; // 配列を返す
+}
+
+function isScrapable($url) {
+  $parsedUrl = parse_url($url); // URLをパースする
+  $baseUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host']; // ベースURLを作成
+  $path = isset($parsedUrl['path']) ? $parsedUrl['path'] : '/'; // パス部分を取得（なければ/）
+  $allRobots = getRobots($baseUrl); // robots.txtの内容を取得
+
+  if (isset($allRobots['*'])) { // 全てのUser-agentに対する指示があれば
+    foreach ($allRobots['*'] as $disallow) { // Disallowパスを順にチェック
+      if ($disallow === '' || $disallow === '/') { // 空文字や/なら
+        return false; // スクレイピング不可
+      } elseif (substr($disallow, -1) === '$' && $path === substr($disallow, 0, -1)) { // $で終わるパスと完全一致なら
+        return false; // スクレイピング不可
+      } elseif (strpos($path, $disallow) === 0) { // パスの先頭がDisallowパスと一致なら
+        return false; // スクレイピング不可
+      }
+    }
+  }
+
+  $path = $path . '/';
+
+  if (isset($allRobots['*'])) { // 全てのUser-agentに対する指示があれば
+    foreach ($allRobots['*'] as $disallow) { // Disallowパスを順にチェック
+      if ($disallow === '' || $disallow === '/') { // 空文字や/なら
+        return false; // スクレイピング不可
+      } elseif (substr($disallow, -1) === '$' && $path === substr($disallow, 0, -1)) { // $で終わるパスと完全一致なら
+        return false; // スクレイピング不可
+      } elseif (strpos($path, $disallow) === 0) { // パスの先頭がDisallowパスと一致なら
+        return false; // スクレイピング不可
+      }
+    }
+  }
+
+
+  return true; // スクレイピング可能
+}
 
 ?>

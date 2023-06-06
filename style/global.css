@@ -27,6 +27,14 @@ footer{
     a{
         color: #fff;
     }
+    footer{
+        color: #b8b8b8;
+    }
+    footer a{
+        color: #b8b8b8;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
 }
 @media (prefers-color-scheme: light) {
     .logo_title_net{

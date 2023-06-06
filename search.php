@@ -38,7 +38,7 @@ $items = $json_d['items'];
 </head>
 <body>
     <header>
-        <h1 class="logo_title"><a href="index.php"></p><span style="color: red;">サクサク</span><span class="logo_title_net">ネット</span></a></h1>
+        <h1 class="logo_title"><a href="./"></p><span style="color: red;">サクサク</span><span class="logo_title_net">ねっと</span></a></h1>
         <form action="search.php" method="get" class="search_container">
                     <input type="text" class="search_box_input" placeholder="キーワード..." name="keyword" value="<?php echo $search_query ?>">
         </form>

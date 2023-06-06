@@ -18,35 +18,43 @@ if(isset($_REQUEST['url'])){
         unlink($imagefile_path);
     }
     else{
-        if(isDomainUrlonList($url)){
-            if (isset($_REQUEST['extra'])){
-                $url = $url . $_REQUEST['titles'];
+        if(isScrapable($url)){
+            if(isDomainUrlonList($url)){
+                if (isset($_REQUEST['extra'])){
+                    $url = $url . $_REQUEST['titles'];
+                }
+    
+                $content_raw_array = Readability_Raw_Extra($url);
+    
+                $title = $content_raw_array[0];
+                $content_raw = $content_raw_array[1];
+    
+                //HTMLのリンクを変換
+                $content_url_prefix = Add_Prefix_2_Link($content_raw, "http://localhost/sakusaku-net/read.php?url=");
+    
+                //HTMLのリンクを変換
+                $content_url_prefix = Add_Prefix_2_Img_Src($content_url_prefix, "http://localhost/sakusaku-net/read.php?root_url={$url}&url=");
             }
-
-            $content_raw_array = Readability_Raw_Extra($url);
-
-            $title = $content_raw_array[0];
-            $content_raw = $content_raw_array[1];
-
-            //HTMLのリンクを変換
-            $content_url_prefix = Add_Prefix_2_Link($content_raw, "http://localhost/sakusaku-net/read.php?url=");
-
-            //HTMLのリンクを変換
-            $content_url_prefix = Add_Prefix_2_Img_Src($content_url_prefix, "http://localhost/sakusaku-net/read.php?root_url={$url}&url=");
+            else{
+                //Rawの本文を取得
+                $content_raw_array = Readability_Raw($url);
+    
+                $title = $content_raw_array[0];
+                $content_raw = $content_raw_array[1];
+    
+                //HTMLのリンクを変換
+                $content_url_prefix = Add_Prefix_2_Link($content_raw, "http://localhost/sakusaku-net/read.php?url=");
+    
+                //HTMLのリンクを変換
+                $content_url_prefix = Add_Prefix_2_Img_Src($content_url_prefix, "http://localhost/sakusaku-net/read.php?root_url={$url}&url=");
+            }
         }
         else{
-            //Rawの本文を取得
-            $content_raw_array = Readability_Raw($url);
-
-            $title = $content_raw_array[0];
-            $content_raw = $content_raw_array[1];
-
-            //HTMLのリンクを変換
-            $content_url_prefix = Add_Prefix_2_Link($content_raw, "http://localhost/sakusaku-net/read.php?url=");
-
-            //HTMLのリンクを変換
-            $content_url_prefix = Add_Prefix_2_Img_Src($content_url_prefix, "http://localhost/sakusaku-net/read.php?root_url={$url}&url=");
+            $title = "Robots.txtによってブロックされました";
+            $content_url_prefix = "お客様がリクエストされたウェブサイトは、Robots.txtによってスクレイピングが禁止されているため、表示できません。元のページを表示する、をクリックしてウェブサイトを表示してください。";
+            $url = "read.php";
         }
+
     }
 }
 else{
@@ -71,7 +79,7 @@ else{
 </head>
 <body>
     <header>
-        <h1><a href="index.php"></p><span style="color: red;">サクサク</span><span  class="logo_title_net">ネット</span></a></h1>
+        <h1><a href="./"></p><span style="color: red;">サクサク</span><span  class="logo_title_net">ねっと</span></a></h1>
         <form action="read.php" method="get" class="search_container">
             <input type="text" class="search_box_input" placeholder="URL..." name="url">
         </form>
@@ -82,7 +90,7 @@ else{
     
     <footer>
     <hr>
-        <p>記事内容・写真の著作権は<a href="<?php echo $url?>">元サイト</a>様の作成者の方に帰属いたします。記事の著作権者はこのサービス（さくさくネット）の作成者（Komugikotan）ではありません。</p>
+        <p>記事内容・写真の著作権は<a href="<?php echo $url?>">元サイト</a>様の作成者の方に帰属いたします。記事の著作権者はこのサービス（さくさくねっと）の作成者（Komugikotan）ではありません。</p>
         <p>©Komugikotan 2023</p>
     </footer>
 </body>
