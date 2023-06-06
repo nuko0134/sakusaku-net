@@ -1,0 +1,60 @@
+body{
+    padding: 0;
+    margin: 0;
+    font-family: 'Merriweather','Helvetica Neue', 'Helvetica', 'Arial',"游ゴシック Medium", Yu Gothic Medium, YuGothic,'Yu Gothic','Hiragino Kaku Gothic Pro', 'Meiryo', 'MS PGothic', sans-serif;
+}
+a{
+    text-decoration: none;
+}
+footer{
+    text-align: center;
+    font-size: 70%;
+    margin: 20px;
+}
+@media (prefers-color-scheme: dark) {
+    body {
+      background-color: #202124;
+      color: #fff;
+    }
+    .logo_title_net{
+        color: #fff;
+    }
+    .search_box_input{
+        background:#424242;	
+        color: #fff;
+        border: none;
+    }
+    a{
+        color: #fff;
+    }
+}
+@media (prefers-color-scheme: light) {
+    .logo_title_net{
+        color: #000;
+    }
+    .search_box_input{
+        background:#fff;
+        color: #000;
+        border: 1px solid #cacacf;
+    }
+    a{
+        color: #111;
+    }
+    body{
+        color: #111;
+    }
+}
+
+.search_box_input{
+    width: 90%;
+    height:40px;
+    border-radius:20px;
+    outline:0;
+    margin-bottom:40px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+header{
+    text-align: center;
+}

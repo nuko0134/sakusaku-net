@@ -1,0 +1,28 @@
+h1{
+    font-size: 1.4rem;
+}
+.article_body{
+    font-size: 1.04rem;
+    line-height: 1.7;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+img{
+    max-width: 100%;
+}
+h3{
+    font-size: 1.1rem;
+    padding-left: 10px;
+    border-left: 4px solid #111;
+    margin-top: 40px;
+}
+h2{
+    border-bottom: 4px double #999;
+}
+header{
+    border: none;
+    text-align: center;
+}
+.reader_url_box{
+    text-align: center;
+}
