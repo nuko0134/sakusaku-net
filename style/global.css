@@ -54,6 +54,11 @@ footer{
     footer{
         color: #424242;
     }
+    footer a{
+        color: #424242;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
 }
 
 .search_box_input{
